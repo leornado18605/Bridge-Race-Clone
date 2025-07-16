@@ -25,8 +25,8 @@ public class PlayerScript : MonoBehaviour
                 {
                     currentlyStandingFloor = hit.transform.gameObject;
 
-                    //if (isAI)
-                    //    gameObject.GetComponent<AIController>().SetCurrentlyStandingFloor();
+                    if (isAI)
+                        gameObject.GetComponent<AIController>().SetCurrentlyStandingFloor();
                 }
             }
         }

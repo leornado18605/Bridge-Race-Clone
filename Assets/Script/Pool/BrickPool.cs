@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BrickPool : MonoBehaviour
+public class BrickPool : Singleton<BrickPool>
 {
-    public static BrickPool Instance;
-
     [Header("Brick Prefabs follow the color")]
     [SerializeField] private GameObject[] brickPrefabs;
 
@@ -12,10 +10,14 @@ public class BrickPool : MonoBehaviour
 
     private Dictionary<int, Queue<GameObject>> brickPools = new Dictionary<int, Queue<GameObject>>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        Instance = this;
+        base.Awake();
+        InitializeBrickPools();
+    }
 
+    private void InitializeBrickPools()
+    {
         for (int i = 0; i < brickPrefabs.Length; i++)
         {
             brickPools[i] = new Queue<GameObject>();

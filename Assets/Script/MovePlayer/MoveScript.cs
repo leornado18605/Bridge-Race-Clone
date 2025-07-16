@@ -21,6 +21,8 @@ public class MoveScript : MonoBehaviour
         if (direction.magnitude >= 0.1f)
         {
             animator.SetBool("Running", true);
+           
+            //Rotate player
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0f, targetAngle + 180f, 0f);
             Debug.Log("Running = true");

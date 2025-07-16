@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BrickSpawner : MonoBehaviour
+public class BrickSpawner : Singleton<BrickSpawner>
 {
     [Tooltip("This number will be multiplied to num of players")]
     [SerializeField] int numOfItemsToSpawn = 10;
@@ -46,7 +46,6 @@ public class BrickSpawner : MonoBehaviour
         {
             Vector3 targetPos = GetValidSpawnPosition();
             var brick = BrickPool.Instance.GetBrick(playerColorIndex, targetPos);
-            brick.transform.parent = brickSpawnPoint.transform;
             brick.transform.parent = brickSpawnPoint.transform;
         }
 

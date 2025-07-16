@@ -20,7 +20,6 @@ public class JoystickControl : MonoBehaviour
 
     public GameObject joystickPanel;
 
-    // Start is called before the first frame update
     void Awake()
     {
         screen.x = Screen.width;
@@ -31,22 +30,31 @@ public class JoystickControl : MonoBehaviour
         joystickPanel.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
+    {
+        MouseEvent();
+    }
+
+    private void OnDisable()
+    {
+        direct = Vector3.zero;
+    }
+
+    public void MouseEvent()
     {
         if (Input.GetMouseButtonDown(0))
         {
             startPoint = MousePosition;
             joystickBG.anchoredPosition = startPoint;
-            joystickPanel.SetActive(true);
+            joystickPanel.SetActive(false);
         }
 
         if (Input.GetMouseButton(0))
         {
             updatePoint = MousePosition;
-            joystickControl.anchoredPosition = Vector3.ClampMagnitude((updatePoint - startPoint), magnitude) + startPoint;
-
             Vector3 offset = updatePoint - startPoint;
+
+            joystickControl.anchoredPosition = Vector3.ClampMagnitude(offset, magnitude) + startPoint;
             direct = new Vector3(-offset.y, 0, offset.x).normalized;
         }
 
@@ -55,10 +63,5 @@ public class JoystickControl : MonoBehaviour
             joystickPanel.SetActive(false);
             direct = Vector3.zero;
         }
-    }
-
-    private void OnDisable()
-    {
-        direct = Vector3.zero;
     }
 }
