@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -51,18 +51,18 @@ public class BridgeConstructorScript : MonoBehaviour
                         hit.transform.gameObject.GetComponent<BridgeTile>().ColorBrick(playerScript.playerColorIndex);
                         stackManager.Pop();
                     }
+
                 }
                 else
                 {
+                    hit.transform.GetChild(0).GetComponentInChildren<BoxCollider>().enabled = true;
                     if (playerScript.isAI)
                     {
-                        player.GetComponent<AIController>().ClearTarget();
-                        StartCoroutine(player.GetComponent<AIController>().GetTargets());
+                        player.GetComponent<AIControl>().ClearTarget();
+                        StartCoroutine(player.GetComponent<AIControl>().GetTargets());
                     }
-                    else
-                    {
-                        hit.transform.GetChild(0).GetComponentInChildren<BoxCollider>().enabled = true;
-                    }
+                    
+                    
                 }
             }
             else if (hit.transform.gameObject.tag == "Floor")

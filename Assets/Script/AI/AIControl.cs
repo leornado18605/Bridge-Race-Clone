@@ -1,20 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class AIController : MonoBehaviour
+public class AIControl: MonoBehaviour
 {
     [SerializeField] List<GameObject> targets = new List<GameObject>();
 
     private Animator animator;
     private NavMeshAgent agent;
     private PlayerScript playerScript;
-    [SerializeField] private bool haveTargetAI = false;
+    [SerializeField] private bool haveTarget = false;
 
     private Vector3 targetTransform;
     private GameObject currentlyStandingFloor;
-    private GameObject ObjectAIColid = null;
+    private GameObject brickSpawnContainer = null;
 
     private GameObject availableBridges;
     private GameObject targetBridge;
@@ -29,48 +30,42 @@ public class AIController : MonoBehaviour
         StartCoroutine(GetTargets());
     }
 
-    //AI find brick, bridge
     public void SetCurrentlyStandingFloor()
     {
         currentlyStandingFloor = playerScript.currentlyStandingFloor;
-        ObjectAIColid = currentlyStandingFloor.transform.GetChild(1).gameObject;
+        brickSpawnContainer = currentlyStandingFloor.transform.GetChild(1).gameObject;
         availableBridges = currentlyStandingFloor.transform.GetChild(2).gameObject;
 
         // select a bridge
-        targetBridge = availableBridges.transform.GetChild(Random.Range(0, availableBridges.transform.childCount)).transform.GetChild(1).gameObject;
+        targetBridge = availableBridges.transform.GetChild(Random.Range(0, availableBridges.transform.childCount)).transform.GetChild(0).gameObject;
     }
 
     public IEnumerator GetTargets()
     {
         if (targets.Count == 0)
         {
-            if (ObjectAIColid == null)
-            {
-                Debug.Log("ObjectAIColid is null");
-            }
-            while (ObjectAIColid == null)
+            while (brickSpawnContainer == null)
             {
                 yield return new WaitForSeconds(0.5f);
             }
 
             //yield return new WaitForSeconds(1f);
 
-            for (int i = 0; i < ObjectAIColid.transform.childCount; i++)
+            for (int i = 0; i < brickSpawnContainer.transform.childCount; i++)
             {
-                if (Color.Equals(playerScript.playerColor, ObjectAIColid.transform.GetChild(i).gameObject.GetComponent<DistinguishColor>().color))
+                if (Color.Equals(playerScript.playerColor, brickSpawnContainer.transform.GetChild(i).gameObject.GetComponent<DistinguishColor>().color))
                 {
-                    targets.Add(ObjectAIColid.transform.GetChild(i).gameObject);
+                    targets.Add(brickSpawnContainer.transform.GetChild(i).gameObject);
                 }
             }
-
-            haveTargetAI = false;
+            haveTarget = false;
         }
     }
 
     public void RemoveTargetFromList(GameObject obj)
     {
         targets.Remove(obj);
-        haveTargetAI = false;
+        haveTarget = false;
     }
 
     void Update()
@@ -81,30 +76,29 @@ public class AIController : MonoBehaviour
 
     void AIStates()
     {
-        if (!haveTargetAI && targets.Count > 0)
+        if (!haveTarget && targets.Count > 0)
         {
             // move to target
             targetTransform = targets[0].gameObject.transform.position;
             agent.SetDestination(targetTransform);
             animator.SetBool("Running", true);
-            haveTargetAI = true;
+            haveTarget = true;
         }
-        else if (!haveTargetAI && targets.Count == 0 && gameObject.GetComponent<StackManager>().isPopable())
+        else if (!haveTarget && targets.Count == 0 && gameObject.GetComponent<StackManager>().isPopable())
         {
             // place bricks to the bridge
             if (targetBridge == null)
                 return;
-
             targetTransform = targetBridge.transform.position;
             agent.SetDestination(targetTransform);
-            haveTargetAI = true;
+            haveTarget = true;
         }
-        else if (haveTargetAI && targets.Count == 0 && Vector3.Distance(gameObject.transform.position, targetTransform) < 0.3f)
+        else if (haveTarget && targets.Count == 0 && Vector3.Distance(gameObject.transform.position, targetTransform) < 0.3f)
         {
             // go to next bridge
             Debug.Log("Next Area " + currentlyStandingFloor.name);
-            haveTargetAI = false;
             StartCoroutine(GetTargets());
+            haveTarget = false;
 
         }
     }
@@ -118,13 +112,6 @@ public class AIController : MonoBehaviour
     {
         float targetAngle = Mathf.Atan2(-targetTransform.x, -targetTransform.z) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-    }
-
-    IEnumerator GoFakeTarget()
-    {
-        Debug.Log("Going fake target " + gameObject.name);
-        yield return new WaitForSeconds(2.5f);
-        haveTargetAI = false;
     }
 
 }

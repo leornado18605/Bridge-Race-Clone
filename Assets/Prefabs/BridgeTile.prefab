@@ -141,6 +141,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4c5062b4e9cd9c4ab3da84c120ab76c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  colorIndex: 0
+  brickMaterials:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  brickRenderer: {fileID: 5963283311846898116}
 --- !u!1 &5963283312431630249
 GameObject:
   m_ObjectHideFlags: 0

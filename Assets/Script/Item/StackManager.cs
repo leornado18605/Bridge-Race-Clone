@@ -11,11 +11,21 @@ public class StackManager : MonoBehaviour
 
     [SerializeField] List<GameObject> bricks = new List<GameObject>();
 
+    //camera
+    private FOVController fovController;
+    private void Start()
+    {
+        fovController = FindObjectOfType<FOVController>();
+    }
     //Ad brick into the stack
     public void Push(GameObject collectedBrick)
     {
         bricks.Add(collectedBrick);
         MoveToStackAnim(collectedBrick);
+
+        //camera lens
+        if (fovController != null)
+            fovController.UpdateFOV(bricks.Count);
     }
 
     public void Pop()
@@ -24,6 +34,10 @@ public class StackManager : MonoBehaviour
         bricks[bricks.Count - 1].gameObject.SetActive(false);
         bricks.RemoveAt(bricks.Count - 1);
         Destroy(objref);
+
+        //camera lens
+        if (fovController != null)
+            fovController.UpdateFOV(bricks.Count);
 
         var playerScript = GetComponent<PlayerScript>();
         //spawn 1 more different brick

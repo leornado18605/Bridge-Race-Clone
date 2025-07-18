@@ -13,7 +13,7 @@ public class BridgeTile : MonoBehaviour
     public void ColorBrick(int _targetColorIndex)
     {
         brickRenderer.enabled = true;
-        brickRenderer.material.SetColor("Color", brickMaterials[_targetColorIndex].color);
+        brickRenderer.material.SetColor("_Color", brickMaterials[_targetColorIndex].color);
         
         colorIndex = _targetColorIndex;
         targetColor = brickMaterials[_targetColorIndex].color;

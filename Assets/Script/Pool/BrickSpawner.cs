@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,15 +10,14 @@ public class BrickSpawner : Singleton<BrickSpawner>
 
     [SerializeField] GameObject brickSpawnPoint;
 
-    private GameObject brickSpawnArea;
+    [Header("Danh sách vùng spawn trên từng sàn")]
+    [SerializeField] List<GameObject> spawnAreas;
 
     [SerializeField] bool isStartArea;
     [SerializeField] LayerMask layerMask;
 
     private void Start()
     {
-        brickSpawnArea = transform.GetChild(0).gameObject;
-
         if (isStartArea)
         {
             StartCoroutine(SpawnItemsAtStart(numOfItemsToSpawn, numOfPlayers));
@@ -27,24 +26,31 @@ public class BrickSpawner : Singleton<BrickSpawner>
 
     public IEnumerator SpawnItemsAtStart(int numItemsToSpawn, int numOfPlayers)
     {
-        for (int j = 0; j < numOfPlayers; j++)
+        foreach (GameObject area in spawnAreas)
         {
-            for (int i = 0; i < numItemsToSpawn; i++)
+            for (int j = 0; j < numOfPlayers; j++)
             {
-                Vector3 targetPos = GetValidSpawnPosition();
-                var brick = BrickPool.Instance.GetBrick(j, targetPos);
-                brick.transform.parent = brickSpawnPoint.transform;
+                for (int i = 0; i < numItemsToSpawn; i++)
+                {
+                    Vector3 targetPos = GetValidSpawnPosition(area);
+                    var brick = BrickPool.Instance.GetBrick(j, targetPos);
+                    brick.transform.parent = brickSpawnPoint.transform;
+                }
             }
         }
 
         yield return null;
     }
 
-    public IEnumerator SpawnItemsAtWill(int numItemsToSpawn, int playerColorIndex)
+    public IEnumerator SpawnItemsAtWill(int numItemsToSpawn, int playerColorIndex, int areaIndex = 0)
     {
+        if (areaIndex < 0 || areaIndex >= spawnAreas.Count) yield break;
+
+        GameObject area = spawnAreas[areaIndex];
+
         for (int i = 0; i < numItemsToSpawn; i++)
         {
-            Vector3 targetPos = GetValidSpawnPosition();
+            Vector3 targetPos = GetValidSpawnPosition(area);
             var brick = BrickPool.Instance.GetBrick(playerColorIndex, targetPos);
             brick.transform.parent = brickSpawnPoint.transform;
         }
@@ -52,9 +58,18 @@ public class BrickSpawner : Singleton<BrickSpawner>
         yield break;
     }
 
-    Vector3 GetValidSpawnPosition()
+    public void SpawnImmediate(int playerColorIndex, int areaIndex = 0)
     {
-        var meshRenderer = brickSpawnArea.GetComponent<MeshRenderer>();
+        if (areaIndex < 0 || areaIndex >= spawnAreas.Count) return;
+
+        Vector3 targetPos = GetValidSpawnPosition(spawnAreas[areaIndex]);
+        var brick = BrickPool.Instance.GetBrick(playerColorIndex, targetPos);
+        brick.transform.parent = brickSpawnPoint.transform;
+    }
+
+    Vector3 GetValidSpawnPosition(GameObject area)
+    {
+        var meshRenderer = area.GetComponent<MeshRenderer>();
         Bounds bounds = meshRenderer.bounds;
 
         Vector3 targetPos = GetRandomPosition(bounds);

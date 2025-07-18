@@ -118,5 +118,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d920d3ab3019db4d9e68e34946fadba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.90588236, g: 0.13333334, b: 0.13333334, a: 1}
+  color: {r: 0.8980392, g: 0.15686275, b: 0.0627451, a: 1}
   isOnStack: 0

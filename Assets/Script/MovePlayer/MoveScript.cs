@@ -1,36 +1,58 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class MoveScript : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
-    [SerializeField] private CharacterController controller;
+    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float gravity = -9.81f;
 
-    private void FixedUpdate()
+    [Header("References")]
+    [SerializeField] private Animator animator;
+
+    private CharacterController controller;
+    private Vector3 velocity;
+
+    private void Awake()
     {
-        HandleJoystickMovement();
+        controller = GetComponent<CharacterController>();
+        controller.stepOffset = 0.4f; // Giúp leo bậc gạch mượt hơn
     }
 
-    void HandleJoystickMovement()
+    private void Update()
     {
-        Vector3 direction = JoystickControl.direct;
-        direction = new Vector3(direction.x, 0f, direction.z).normalized;
+        HandleMovement();
+    }
 
-        controller.Move(direction * moveSpeed * Time.deltaTime);
+    void HandleMovement()
+    {
+        // Lấy hướng từ joystick
+        Vector3 input = JoystickControl.direct;
+        Vector3 moveDirection = new Vector3(input.x, 0f, input.z).normalized;
 
-        if (direction.magnitude >= 0.1f)
+        // Di chuyển theo hướng joystick
+        controller.Move(moveDirection * moveSpeed * Time.deltaTime);
+
+        // Xoay nhân vật theo hướng di chuyển
+        if (moveDirection.magnitude >= 0.1f)
         {
-            animator.SetBool("Running", true);
-           
-            //Rotate player
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, targetAngle + 180f, 0f);
-            Debug.Log("Running = true");
+            float targetAngle = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0f, targetAngle + 180f, 0f); // giống script 1
+
+            if (animator) animator.SetBool("Running", true);
         }
         else
         {
-            animator.SetBool("Running", false);
-            Debug.Log("Running = false");
+            if (animator) animator.SetBool("Running", false);
         }
+
+        // Gravity thủ công
+        if (controller.isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f; // giữ nhân vật dính mặt đất
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
     }
 }

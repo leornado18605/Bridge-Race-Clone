@@ -19,9 +19,9 @@ public class DistinguishColor : MonoBehaviour
             other.transform.GetComponent<StackManager>().Push(gameObject);
             gameObject.GetComponent<Collider>().enabled = false;
 
-            if (other.transform.GetComponent<AIController>() != null)
+            if (other.transform.GetComponent<AIControl>() != null)
             {
-                other.transform.GetComponent<AIController>().RemoveTargetFromList(gameObject);
+                other.transform.GetComponent<AIControl>().RemoveTargetFromList(gameObject);
             }
 
             isOnStack = true;
